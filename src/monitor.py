@@ -1,91 +1,52 @@
-#!/usr/bin/env python3
-"""
-Monitor principal del canal de YouTube
-"""
-import time
+import os
 import json
-from pathlib import Path
 from datetime import datetime
-from dotenv import load_dotenv
+from pathlib import Path
 
-from .config import CHECKINTERVALHOURS, CACHEFILE, DATADIR
-from .youtube import get_new_videos
-from .telegram_sender import send_analysis
-
-load_dotenv()
+# Configuración de cache
+USE_CLOUD_STORAGE = os.getenv('USE_CLOUD_STORAGE', 'false').lower() == 'true'
+CACHE_FILE_LOCAL = Path('/tmp/cache.json')  # /tmp es escribible en Cloud Run
 
 def load_processed_ids():
     """Cargar IDs procesados del cache"""
-    if CACHEFILE.exists():
-        with open(CACHEFILE, 'r') as f:
-            data = json.load(f)
+    try:
+        if USE_CLOUD_STORAGE:
+            # TODO: Implementar Google Cloud Storage
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(os.getenv('GCS_BUCKET_NAME'))
+            blob = bucket.blob('processed_videos.json')
+            data = json.loads(blob.download_as_string())
             return set(data.get('processed_videos', []))
+        else:
+            # Usar archivo local en /tmp
+            if CACHE_FILE_LOCAL.exists():
+                with open(CACHE_FILE_LOCAL, 'r') as f:
+                    data = json.load(f)
+                    return set(data.get('processed_videos', []))
+    except Exception as e:
+        print(f"⚠️ Error cargando cache: {e}")
+    
     return set()
 
 def save_processed_ids(processed_ids):
     """Guardar IDs procesados al cache"""
-    DATADIR.mkdir(exist_ok=True)
-    with open(CACHEFILE, 'w') as f:
-        json.dump({
+    try:
+        data = {
             'processed_videos': list(processed_ids),
             'last_updated': datetime.now().isoformat()
-        }, f, indent=2)
-
-def main():
-    """Loop principal de monitoreo"""
-    print(f"🚀 Iniciando monitor de YouTube")
-    print(f"📺 Intervalo de chequeo: {CHECKINTERVALHOURS} horas")
-    
-    processed_ids = load_processed_ids()
-    print(f"📝 Videos procesados previamente: {len(processed_ids)}")
-    
-    while True:
-        try:
-            print(f"\n🔍 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Chequeando nuevos videos...")
-            
-            # Obtener videos nuevos
-            new_videos = get_new_videos(processed_ids)
-            
-            if not new_videos:
-                print("✅ No hay videos nuevos")
-            else:
-                print(f"🎥 Encontrados {len(new_videos)} videos nuevos")
-                
-                for video in new_videos:
-                    try:
-                        print(f"\n📹 Procesando: {video['title']}")
-                        
-                        # Aquí iría la lógica completa de tu test_full_flow.py
-                        # 1. Obtener transcripción
-                        # 2. Analizar con Perplexity
-                        # 3. Enviar a Telegram
-                        
-                        # Por ahora, usar send_analysis que deberás implementar
-                        success = send_analysis(video)
-                        
-                        if success:
-                            processed_ids.add(video['id'])
-                            save_processed_ids(processed_ids)
-                            print(f"✅ Video procesado correctamente")
-                        else:
-                            print(f"❌ Error procesando video")
-                            
-                    except Exception as e:
-                        print(f"❌ Error procesando {video['id']}: {e}")
-                        continue
-            
-            # Esperar hasta el próximo chequeo
-            sleep_seconds = CHECKINTERVALHOURS * 3600
-            print(f"\n😴 Esperando {CHECKINTERVALHOURS} horas hasta el próximo chequeo...")
-            time.sleep(sleep_seconds)
-            
-        except KeyboardInterrupt:
-            print("\n👋 Deteniendo monitor...")
-            break
-        except Exception as e:
-            print(f"❌ Error en loop principal: {e}")
-            print("⏳ Esperando 5 minutos antes de reintentar...")
-            time.sleep(300)
-
-if __name__ == "__main__":
-    main()
+        }
+        
+        if USE_CLOUD_STORAGE:
+            from google.cloud import storage
+            client = storage.Client()
+            bucket = client.bucket(os.getenv('GCS_BUCKET_NAME'))
+            blob = bucket.blob('processed_videos.json')
+            blob.upload_from_string(json.dumps(data, indent=2))
+        else:
+            with open(CACHE_FILE_LOCAL, 'w') as f:
+                json.dump(data, f, indent=2)
+        
+        print(f"✅ Cache guardado: {len(processed_ids)} videos")
+    except Exception as e:
+        print(f"❌ Error guardando cache: {e}")

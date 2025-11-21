@@ -1,27 +1,24 @@
-FROM python:3.11-slim
+# Usar imagen oficial de Python
+FROM python:3.9-slim
 
+# Establecer directorio de trabajo
 WORKDIR /app
-
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copiar archivos de dependencias
 COPY requirements.txt .
 
-# Instalar dependencias Python
+# Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código fuente
-COPY src/ ./src/
-COPY test_full_flow.py .
+COPY . .
 
-# Crear directorio de datos
-RUN mkdir -p /app/data
+# Exponer puerto
+EXPOSE 8080
 
-# Variable de entorno para Python
+# Variables de entorno por defecto
+ENV PORT=8080
 ENV PYTHONUNBUFFERED=1
 
-# Comando por defecto (ajustar según tu script principal)
-CMD ["python", "-u", "src/monitor.py"]
+# Comando para ejecutar la app
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app

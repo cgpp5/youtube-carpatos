@@ -1,0 +1,10 @@
+# Core dependencies
+perplexityai==1.0.0
+feedparser==6.0.10
+youtube-transcript-api==0.6.1
+python-dotenv==1.0.0
+schedule==1.2.0
+
+# Utilities
+python-dateutil==2.8.2
+requests==2.31.0

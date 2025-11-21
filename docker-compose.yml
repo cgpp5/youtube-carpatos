@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  youtube-monitor:
+    build: .
+    container_name: youtube-monitor
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - TZ=Europe/Madrid

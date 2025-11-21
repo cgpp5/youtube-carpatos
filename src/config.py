@@ -1,0 +1,30 @@
+"""
+Configuración centralizada del proyecto
+"""
+import os
+from pathlib import Path
+
+# Rutas
+BASE_DIR = Path(__file__).parent.parent
+DATA_DIR = BASE_DIR / "data"
+LOGS_DIR = DATA_DIR / "logs"
+CACHE_FILE = DATA_DIR / "cache.json"
+
+# Crear directorios si no existen
+DATA_DIR.mkdir(exist_ok=True)
+LOGS_DIR.mkdir(exist_ok=True)
+
+# YouTube
+YOUTUBE_CHANNEL_ID = os.getenv('YOUTUBE_CHANNEL_ID', 'UCYRxqvVMvPYDL0F35gJ9rjQ')
+RSS_URL = f'https://www.youtube.com/feeds/videos.xml?channel_id={YOUTUBE_CHANNEL_ID}'
+
+# LLM Configuration
+LLM_MODEL = os.getenv('LLM_MODEL', 'sonar-reasoning')
+PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
+
+# Telegram
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+
+# Schedule
+CHECK_INTERVAL_HOURS = int(os.getenv('CHECK_INTERVAL_HOURS', '2'))

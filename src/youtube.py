@@ -4,7 +4,7 @@ Módulo para interactuar con YouTube
 import feedparser
 from youtube_transcript_api import YouTubeTranscriptApi
 from typing import List, Dict, Optional
-from .config import RSSURL
+from .config import RSS_URL
 
 def get_new_videos(processed_ids: set) -> List[Dict]:
     """
@@ -15,7 +15,7 @@ def get_new_videos(processed_ids: set) -> List[Dict]:
         Lista de diccionarios con info de videos nuevos
     """
     try:
-        feed = feedparser.parse(RSSURL)
+        feed = feedparser.parse(RSS_URL)
         new_videos = []
         
         for entry in feed.entries:
@@ -58,3 +58,4 @@ def get_transcript(video_id: str) -> Optional[str]:
     except Exception as e:
         print(f"❌ Error obteniendo transcripción para {video_id}: {e}")
         return None
+

@@ -1,6 +1,6 @@
 # Core dependencies
 perplexityai==0.20.0
-feedparser==6.0.10
+feedparser==6.0.11
 youtube-transcript-api==0.6.1
 python-dotenv==1.0.0
 schedule==1.2.0
@@ -12,4 +12,5 @@ requests==2.31.0
 # Para Cloud Run
 flask==3.0.0
 gunicorn==21.2.0
+
 

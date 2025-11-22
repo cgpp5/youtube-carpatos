@@ -1,24 +1,22 @@
-# Usar imagen oficial de Python
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Copiar requirements primero (para cache de Docker)
 COPY requirements.txt .
 
 # Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar código fuente
+# Copiar todo el código
 COPY . .
 
 # Exponer puerto
 EXPOSE 8080
 
-# Variables de entorno por defecto
+# Variables de entorno
 ENV PORT=8080
 ENV PYTHONUNBUFFERED=1
 
-# Comando para ejecutar la app
+# Comando para ejecutar con gunicorn
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app

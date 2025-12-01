@@ -42,7 +42,8 @@ def get_transcript(video_id: str) -> Optional[str]:
         Transcripción completa como string, o None si falla
     """
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        ytt_api = YouTubeTranscriptApi()
+        transcript_list = ytt_api.list(video_id)
         
         # Intentar español primero
         try:
@@ -52,7 +53,8 @@ def get_transcript(video_id: str) -> Optional[str]:
             transcript = transcript_list.find_transcript(['en'])
         
         transcript_data = transcript.fetch()
-        full_transcript = ' '.join([segment['text'] for seg in transcript_data])
+        raw_data = transcript_data.to_raw_data()
+        full_transcript = ' '.join([segment['text'] for segment in raw_data])
         
         return full_transcript
     except Exception as e:

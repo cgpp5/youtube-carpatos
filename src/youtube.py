@@ -1,6 +1,7 @@
 """
 Módulo para interactuar con YouTube
 """
+import time
 import feedparser
 from youtube_transcript_api import YouTubeTranscriptApi
 from typing import List, Dict, Optional
@@ -42,6 +43,8 @@ def get_transcript(video_id: str) -> Optional[str]:
         Transcripción completa como string, o None si falla
     """
     try:
+        # Add delay to avoid YouTube rate limiting
+        time.sleep(5)
         ytt_api = YouTubeTranscriptApi()
         transcript_list = ytt_api.list(video_id)
         

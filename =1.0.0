@@ -1,3 +1,0 @@
-Defaulting to user installation because normal site-packages is not writeable
-Requirement already satisfied: youtube-transcript-api in /home/runner/.local/lib/python3.12/site-packages (0.6.1)
-Requirement already satisfied: requests in /usr/lib/python3/dist-packages (from youtube-transcript-api) (2.31.0)

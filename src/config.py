@@ -15,7 +15,7 @@ DATA_DIR.mkdir(exist_ok=True)
 LOGS_DIR.mkdir(exist_ok=True)
 
 # YouTube
-YOUTUBE_CHANNEL_ID = os.getenv('YOUTUBE_CHANNEL_ID', 'UCYRxqvVMvPYDL0F35gJ9rjQ')
+YOUTUBE_CHANNEL_ID = os.getenv('YOUTUBE_CHANNEL_ID', 'UCmJL2llHf2tEcDAjaz-LFgQ')
 RSS_URL = f'https://www.youtube.com/feeds/videos.xml?channel_id={YOUTUBE_CHANNEL_ID}'
 
 # LLM Configuration
@@ -28,3 +28,4 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 # Schedule
 CHECK_INTERVAL_HOURS = int(os.getenv('CHECK_INTERVAL_HOURS', '2'))
+

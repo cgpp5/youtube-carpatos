@@ -42,6 +42,20 @@ def health():
         'timestamp': datetime.now().isoformat()
     })
 
+@app.route('/cache')
+def view_cache():
+    """Ver IDs procesados en el cache"""
+    try:
+        processed_ids = load_processed_ids()
+        return jsonify({
+            'total': len(processed_ids),
+            'ids': list(processed_ids)
+        })
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }), 500
+
 @app.route('/monitor')
 def monitor():
     """Ejecuta el monitoreo con lógica de horarios inteligente"""

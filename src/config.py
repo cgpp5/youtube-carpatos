@@ -3,6 +3,10 @@ Configuración centralizada del proyecto
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde . env
+load_dotenv()
 
 # Rutas
 BASE_DIR = Path(__file__).parent.parent
@@ -28,4 +32,5 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 # Schedule
 CHECK_INTERVAL_HOURS = int(os.getenv('CHECK_INTERVAL_HOURS', '2'))
+
 

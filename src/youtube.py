@@ -15,8 +15,8 @@ def get_new_videos(processed_ids: set) -> List[Dict]:
     Args:
         processed_ids: Set de IDs de videos ya procesados
     Returns:
-        Lista de diccionarios con info de videos nuevos, filtered to current date
-        and sorted by publication date (oldest first)
+        Lista de diccionarios con info de videos nuevos, filtrados por fecha actual
+        y ordenados por fecha de publicación (más antiguos primero)
     """
     try:
         feed = feedparser.parse(RSS_URL)

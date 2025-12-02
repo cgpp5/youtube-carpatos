@@ -17,7 +17,7 @@ class TestVideoFiltering(unittest.TestCase):
         """Set up test fixtures"""
         self.today = datetime.now()
         self.yesterday = self.today - timedelta(days=1)
-        self.tomorrow = self.today + timedelta(days=2)
+        self.tomorrow = self.today + timedelta(days=1)
 
     def _create_mock_entry(self, video_id: str, title: str, published_dt: datetime):
         """Helper to create a mock RSS entry"""

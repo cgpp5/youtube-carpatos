@@ -3,14 +3,13 @@ Enviar mensajes a Telegram con análisis de Perplexity
 """
 import os
 import requests
-import re
 from typing import Dict, Optional
 from .config import PERPLEXITY_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 from .youtube import get_transcript
 
 def analyze_with_perplexity(transcript: str, title: str) -> Optional[str]:
     """
-    Analizar transcripción con Perplexity Sonar Reasoning
+    Analizar transcripción con Perplexity Sonar Pro
     (Lógica adaptada de test_full_flow.py)
     """
     MAX_CHARS = 300000
@@ -76,7 +75,7 @@ Reglas:
                 'Content-Type': 'application/json'
             },
             json={
-                'model': 'sonar-reasoning',
+                'model': 'sonar-pro',
                 'messages': [
                     {'role': 'user', 'content': PROMPT}
                 ]
@@ -87,9 +86,6 @@ Reglas:
         
         response_data = response.json()
         analysis = response_data['choices'][0]['message']['content']
-        
-        # Limpiar tokens de razonamiento <think>...</think>
-        analysis = re.sub(r'<think>.*?</think>', '', analysis, flags=re.DOTALL).strip()
         
         # Estadísticas
         usage = response_data.get('usage', {})
@@ -124,7 +120,7 @@ def send_analysis(video: Dict) -> bool:
         
         print(f"  📄 Transcripción obtenida: {len(transcript)} caracteres")
         
-        print(f"  🧠 Analizando con Perplexity Sonar Reasoning...")
+        print(f"  🧠 Analizando con Perplexity Sonar Pro...")
         analysis = analyze_with_perplexity(transcript, video['title'])
         if not analysis:
             print(f"  ❌ No se pudo obtener análisis")
@@ -141,7 +137,7 @@ def send_analysis(video: Dict) -> bool:
 {analysis}
 
 ---
-_Análisis generado automáticamente por Perplexity Sonar Reasoning_
+_Análisis generado automáticamente por Perplexity Sonar Pro_
 """
         
         # Limitar a 4096 caracteres (límite de Telegram)

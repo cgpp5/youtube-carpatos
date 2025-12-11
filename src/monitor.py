@@ -1,11 +1,11 @@
 import os
 import json
 from datetime import datetime
-from pathlib import Path
+from .config import CACHE_FILE
 
 # Configuración de cache
 USE_CLOUD_STORAGE = os.getenv('USE_CLOUD_STORAGE', 'false').lower() == 'true'
-CACHE_FILE_LOCAL = Path('/tmp/cache.json')  # /tmp es escribible en Cloud Run
+CACHE_FILE_LOCAL = CACHE_FILE
 
 def load_processed_ids():
     """Cargar IDs procesados del cache"""

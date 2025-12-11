@@ -19,7 +19,7 @@ def load_processed_ids():
             data = json.loads(blob.download_as_string())
             return set(data.get('processed_videos', []))
         else:
-            # Usar archivo local en /tmp
+            # Usar archivo local (data/cache.json)
             if CACHE_FILE_LOCAL.exists():
                 with open(CACHE_FILE_LOCAL, 'r') as f:
                     data = json.load(f)

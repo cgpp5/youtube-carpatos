@@ -9,14 +9,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Rutas
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
-LOGS_DIR = DATA_DIR / "logs"
 CACHE_FILE = DATA_DIR / "cache.json"
 
 # Crear directorios si no existen
 DATA_DIR.mkdir(exist_ok=True)
-LOGS_DIR.mkdir(exist_ok=True)
 
 # YouTube
 YOUTUBE_CHANNEL_ID = os.getenv('YOUTUBE_CHANNEL_ID', 'UCmJL2llHf2tEcDAjaz-LFgQ')
@@ -30,7 +28,5 @@ PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-# Schedule
-CHECK_INTERVAL_HOURS = int(os.getenv('CHECK_INTERVAL_HOURS', '2'))
 
 

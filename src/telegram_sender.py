@@ -17,7 +17,7 @@ def analyze_with_perplexity(transcript: str, title: str) -> Optional[str]:
         print(f"  ⚠️ Transcripción muy larga ({len(transcript)} chars), truncando a {MAX_CHARS}...")
         transcript = transcript[:MAX_CHARS]
     
-    PROMPT = f"""Eres un analista financiero experto. Analiza esta transcripción del video de José Luis Cárpatos.
+    PROMPT = f"""Eres un analista financiero experto. Analiza esta transcripción del video de José Luis Cárpatos de forma impersonal.
 
 TRANSCRIPCIÓN:
 {transcript}
@@ -33,7 +33,7 @@ Genera el análisis con formato de tarjetas informativas:
 S&P 500:
   🟢 Soporte ........ [X]
   🔴 Resistencia .... [X]
-  📍 Actual ......... [X]
+  📍 Actual .......... [X]
 
 [Otros valores con formato similar]
 
@@ -57,14 +57,17 @@ Factores negativos:
   ✗ [Factor 2]
 
 ⚡ Recomendación
-[Consejo, no más de 300 caracteres]
+[Dar consejo, no más de 300 caracteres]
 
 Reglas:
 - Ultra conciso
-- Niveles con puntos para alineación
+- Utilizar lenguaje impersonal sin referirse al autor del vídeo, utilizar pasiva refleja
+- Niveles clave con puntos para su alineación
+- Dentro de los niveles técnicos, si sólo se menciona el nivel actual de un valor pero no los soportes o resistencias entonces no incluir ese valor.
 - Máximo 10 eventos
-- Los eventos clave son aquellos programados en una fecha específica o rango de fechas, los eventos probabilísticos o históricos no se consideran
+- Los eventos clave son aquellos programados en una fecha específica o rango de fechas, los eventos probabilísticos o históricos no se consideran. Los anuncios de cuándo cierran o reabren las bolsas tampoco son eventos.
 - Si no hay info, escribe "N/A"
+- Máximo 5 factores positivos y 5 negativos
 """
     
     try:
@@ -173,5 +176,6 @@ def send_analysis(video: Dict) -> bool:
             except:
                 print(f"  Detalles: {e.response.text}")
         return False
+
 
 

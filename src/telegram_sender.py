@@ -140,7 +140,7 @@ def send_analysis(video: Dict) -> bool:
         
         # Antes de enviar, formatea el análisis
         safe_analysis = format_to_html(analysis)
-        message = f"""<b>{clean_for_html(video['title'])}</b>
+        message = f"""<b>{video['title']}</b>
 {video['link']}
 {safe_analysis}
 """
@@ -176,6 +176,7 @@ def send_analysis(video: Dict) -> bool:
             except:
                 print(f"  Detalles: {e.response.text}")
         return False
+
 
 
 

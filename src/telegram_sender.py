@@ -60,12 +60,13 @@ Factores negativos:
 [Dar consejo, no más de 300 caracteres]
 
 Reglas:
-- Ultra conciso
-- Utilizar lenguaje impersonal sin referirse al autor del vídeo, utilizar pasiva refleja
+- Lenguaje ultra conciso, preferir el uso del infinitivo y el lenguaje telegráfico
+- No mencionar el número de caracteres
+- Utilizar lenguaje impersonal sin referirse al autor del vídeo
 - Niveles clave con puntos para su alineación
 - Dentro de los niveles técnicos, si sólo se menciona el nivel actual de un valor pero no los soportes o resistencias entonces no incluir ese valor.
 - Máximo 10 eventos
-- Los eventos clave son aquellos programados en una fecha específica o rango de fechas, los eventos probabilísticos o históricos no se consideran. Los anuncios de cuándo cierran o reabren las bolsas tampoco son eventos.
+- Los eventos clave son aquellos programados en una fecha específica o rango de fechas, los eventos probabilísticos o históricos no se consideran, tampoco los anuncios de cuándo ciertas bolsas estarán abiertas o cerradas.
 - Si no hay info, escribe "N/A"
 - Máximo 5 factores positivos y 5 negativos
 """
@@ -178,6 +179,7 @@ def send_analysis(video: Dict) -> bool:
             except:
                 print(f"  Detalles: {e.response.text}")
         return False
+
 
 
 

@@ -103,6 +103,15 @@ Reglas:
         print(f"  ❌ Error: {e}")
         return None
 
+def format_to_html(text: str) -> str:
+    """Convierte Markdown básico de la IA a HTML simple"""
+    # Escapar caracteres HTML primero para seguridad
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    # Convertir negritas de Markdown (**) a HTML (<b>)
+    import re
+    text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+    return text
+    
 def send_analysis(video: Dict) -> bool:
     """
     Procesar video completo y enviar a Telegram
@@ -126,7 +135,8 @@ def send_analysis(video: Dict) -> bool:
             print(f"  ❌ No se pudo obtener análisis")
             return False
         
-        # Formatear mensaje
+        # Antes de enviar, formatea el análisis
+        safe_analysis = format_to_html(analysis)
         message = f"""🎥 **Nuevo análisis de José Luis Cárpatos**
 
 📹 {video['title']}
@@ -134,7 +144,7 @@ def send_analysis(video: Dict) -> bool:
 
 ---
 
-{analysis}
+{safe_analysis}
 
 ---
 _Análisis generado automáticamente por Perplexity Sonar Pro_
@@ -151,7 +161,7 @@ _Análisis generado automáticamente por Perplexity Sonar Pro_
             json={
                 "chat_id": TELEGRAM_CHAT_ID,
                 "text": message,
-                "parse_mode": "Markdown",
+                "parse_mode": "HTML",
                 "disable_web_page_preview": False
             },
             timeout=30
@@ -171,3 +181,4 @@ _Análisis generado automáticamente por Perplexity Sonar Pro_
             except:
                 print(f"  Detalles: {e.response.text}")
         return False
+

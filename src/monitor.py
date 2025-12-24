@@ -4,8 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Configuración de cache
-USE_CLOUD_STORAGE = os.getenv('USE_CLOUD_STORAGE', 'false').lower() == 'true'
-CACHE_FILE_LOCAL = Path('/tmp/cache.json')  # /tmp es escribible en Cloud Run
+from .config import CACHE_FILE as CACHE_FILE_LOCAL, USE_CLOUD_STORAGE
 
 def load_processed_ids():
     """Cargar IDs procesados del cache"""
@@ -50,3 +49,4 @@ def save_processed_ids(processed_ids):
         print(f"✅ Cache guardado: {len(processed_ids)} videos")
     except Exception as e:
         print(f"❌ Error guardando cache: {e}")
+

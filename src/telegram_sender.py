@@ -137,17 +137,9 @@ def send_analysis(video: Dict) -> bool:
         
         # Antes de enviar, formatea el análisis
         safe_analysis = format_to_html(analysis)
-        message = f"""🎥 **Nuevo análisis de José Luis Cárpatos**
-
-📹 {video['title']}
-🔗 {video['link']}
-
----
-
+        message = f"""<b>{clean_for_html(video['title'])}</b>
+{video['link']}
 {safe_analysis}
-
----
-_Análisis generado automáticamente por Perplexity Sonar Pro_
 """
         
         # Limitar a 4096 caracteres (límite de Telegram)
@@ -181,4 +173,5 @@ _Análisis generado automáticamente por Perplexity Sonar Pro_
             except:
                 print(f"  Detalles: {e.response.text}")
         return False
+
 

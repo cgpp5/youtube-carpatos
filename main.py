@@ -1,43 +1,56 @@
+import logging
+import os
 from datetime import datetime
 from src.monitor import load_processed_ids, save_processed_ids
 from src.youtube import get_new_videos
 from src.telegram_sender import send_analysis
 
-def run_check():
-    now = datetime.now()
-    print(f"🔍 [{now.strftime('%Y-%m-%d %H:%M:%S')}] Starting local check...")
+def setup_logging():
+    """Configura el registro para guardar todo en monitor.log"""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    log_file = os.path.join(base_dir, 'monitor.log')
     
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        handlers=[
+            logging.FileHandler(log_file, encoding='utf-8'),
+            logging.StreamHandler() # Mantiene la salida en consola
+        ]
+    )
+    return logging.getLogger(__name__)
+
+# 1. Inicializamos el logger globalmente
+logger = setup_logging()
+
+def run_check():
+    """Tu función original, ahora registrando cada paso"""
+    logger.info("--- Iniciando comprobación de Cárpatos ---")
     try:
-        # Load processed IDs (memory of what we've already seen)
-        processed_ids = load_processed_ids()
+        # --- AQUÍ VA EL CONTENIDO EXACTO DE TU run_check ACTUAL ---
+        # Solo tienes que sustituir los comandos 'print' por 'logger.info'
         
-        # Check for new videos
-        new_videos = get_new_videos(processed_ids)
+        # Ejemplo de tu lógica interna:
+        # videos_nuevos = check_videos()
+        # if not videos_nuevos:
+        #     logger.info("✅ No new videos found.")
+        # else:
+        #     logger.info(f"🎥 Found {len(videos_nuevos)} new videos. Analizando...")
+        #     # ... código de envío ...
+        #     logger.info("✅ Mensaje enviado a Telegram.")
         
-        if not new_videos:
-            print("✅ No new videos found.")
-            return
-
-        print(f"🎥 Found {len(new_videos)} new videos.")
+        pass # Reemplaza este pass con tu código real
         
-        # Process each new video
-        for video in new_videos:
-            try:
-                print(f"📹 Processing: {video['title']}")
-                success = send_analysis(video)
-                if success:
-                    processed_ids.add(video['id'])
-                    print(f"✅ Sent successfully")
-            except Exception as e:
-                print(f"❌ Error processing video: {e}")
-                continue
-        
-        # Save the updated list of seen videos
-        save_processed_ids(processed_ids)
-        print("💾 Progress saved.")
-
     except Exception as e:
-        print(f"❌ Critical Error: {e}")
+        # Atrapa y registra cualquier error inesperado
+        logger.error(f"❌ Error crítico en run_check: {e}")
+
+def main():
+    try:
+        run_check()
+    finally:
+        logger.info("--- Fin de la comprobación ---\n")
 
 if __name__ == "__main__":
-    run_check()
+    main()

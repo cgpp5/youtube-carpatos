@@ -82,21 +82,14 @@ def get_transcript(video_id: str) -> Optional[str]:
         else:
             logging.warning("⚠️ No se encontraron credenciales de Evomi en .env. Conectando sin proxy.")
 
-        # Llamada a la API con proxy si está configurado
+        # Llamada a la API directa con proxies y orden de idiomas
+        idiomas = ['es', 'es-ES', 'es-MX', 'en']
+        
         if proxies:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id, proxies=proxies)
+            raw_data = YouTubeTranscriptApi.get_transcript(video_id, languages=idiomas, proxies=proxies)
         else:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+            raw_data = YouTubeTranscriptApi.get_transcript(video_id, languages=idiomas)
         
-        # Intentar español primero
-        try:
-            transcript = transcript_list.find_transcript(['es', 'es-ES', 'es-MX'])
-        except:
-            # Fallback a inglés
-            transcript = transcript_list.find_transcript(['en'])
-        
-        transcript_data = transcript.fetch()
-        raw_data = transcript_data.to_raw_data()
         full_transcript = ' '.join([segment['text'] for segment in raw_data])
         
         return full_transcript

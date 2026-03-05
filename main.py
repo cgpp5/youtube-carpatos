@@ -25,25 +25,40 @@ def setup_logging():
 logger = setup_logging()
 
 def run_check():
-    """Tu función original, ahora registrando cada paso"""
-    logger.info("--- Iniciando comprobación de Cárpatos ---")
+    """Ejecuta la comprobación de videos nuevos y los envía por Telegram"""
+    now = datetime.now()
+    logger.info(f"🔍 [{now.strftime('%Y-%m-%d %H:%M:%S')}] Iniciando comprobación de Cárpatos...")
+    
     try:
-        # --- AQUÍ VA EL CONTENIDO EXACTO DE TU run_check ACTUAL ---
-        # Solo tienes que sustituir los comandos 'print' por 'logger.info'
+        # Cargar IDs procesados (memoria de lo que ya hemos visto)
+        processed_ids = load_processed_ids()
         
-        # Ejemplo de tu lógica interna:
-        # videos_nuevos = check_videos()
-        # if not videos_nuevos:
-        #     logger.info("✅ No new videos found.")
-        # else:
-        #     logger.info(f"🎥 Found {len(videos_nuevos)} new videos. Analizando...")
-        #     # ... código de envío ...
-        #     logger.info("✅ Mensaje enviado a Telegram.")
+        # Buscar nuevos videos
+        new_videos = get_new_videos(processed_ids)
         
-        pass # Reemplaza este pass con tu código real
+        if not new_videos:
+            logger.info("✅ No se encontraron videos nuevos.")
+            return
+
+        logger.info(f"🎥 Encontrados {len(new_videos)} videos nuevos.")
         
+        # Procesar cada video nuevo
+        for video in new_videos:
+            try:
+                logger.info(f"📹 Procesando: {video['title']}")
+                success = send_analysis(video)
+                if success:
+                    processed_ids.add(video['id'])
+                    logger.info("✅ Enviado con éxito")
+            except Exception as e:
+                logger.error(f"❌ Error procesando video: {e}")
+                continue
+        
+        # Guardar la lista actualizada de videos vistos
+        save_processed_ids(processed_ids)
+        logger.info("💾 Progreso guardado.")
+
     except Exception as e:
-        # Atrapa y registra cualquier error inesperado
         logger.error(f"❌ Error crítico en run_check: {e}")
 
 def main():

@@ -5,22 +5,17 @@ import os
 import requests
 from typing import Dict, Optional
 from .config import PERPLEXITY_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
-from .youtube import get_transcript
 
-def analyze_with_perplexity(transcript: str, title: str) -> Optional[str]:
+def analyze_with_perplexity(video_url: str, title: str) -> Optional[str]:
     """
-    Analizar transcripción con Perplexity Sonar Pro
-    (Lógica adaptada de test_full_flow.py)
+    Analiza directamente un vídeo de YouTube usando Perplexity Sonar Pro,
+    delegando en el modelo la obtención del contenido del vídeo.
     """
-    MAX_CHARS = 300000
-    if len(transcript) > MAX_CHARS:
-        print(f"  ⚠️ Transcripción muy larga ({len(transcript)} chars), truncando a {MAX_CHARS}...")
-        transcript = transcript[:MAX_CHARS]
-    
-    PROMPT = f"""Eres un analista financiero experto. Analiza esta transcripción del video de José Luis Cárpatos de forma impersonal.
+    PROMPT =  f"""Eres un analista financiero experto. Analiza el contenido del siguiente vídeo de YouTube de José Luis Cárpatos:
 
-TRANSCRIPCIÓN:
-{transcript}
+{video_url}
+
+El análisis debe basarse en el contenido completo del vídeo, no en la descripción.
 
 Genera el análisis con formato de tarjetas informativas:
 
@@ -70,41 +65,44 @@ Reglas:
 - Si no hay info, escribe "N/A"
 - Máximo 5 factores positivos y 5 negativos
 """
-    
+
     try:
         response = requests.post(
-            'https://api.perplexity.ai/chat/completions',
+            "https://api.perplexity.ai/chat/completions",
             headers={
-                'Authorization': f'Bearer {PERPLEXITY_API_KEY}',
-                'Content-Type': 'application/json'
+                "Authorization": f"Bearer {PERPLEXITY_API_KEY}",
+                "Content-Type": "application/json",
             },
             json={
-                'model': 'sonar-pro',
-                'messages': [
-                    {'role': 'user', 'content': PROMPT}
-                ]
+                "model": "sonar-pro",
+                "messages": [
+                    {"role": "user", "content": PROMPT}
+                ],
             },
-            timeout=120
+            timeout=120,
         )
         response.raise_for_status()
-        
-        response_data = response.json()
-        analysis = response_data['choices'][0]['message']['content']
-        
-        # Estadísticas
-        usage = response_data.get('usage', {})
-        cost = usage.get('cost', {})
-        print(f"  💰 Tokens: {usage.get('total_tokens', 'N/A')} | Coste: ${cost.get('total_cost', 0):.4f}")
-        
+
+        data = response.json()
+        analysis = data["choices"][0]["message"]["content"]
+
+        usage = data.get("usage", {})
+        cost = usage.get("cost", {})
+        print(
+            f"💰 Tokens: {usage.get('total_tokens', 'N/A')} | "
+            f"Coste: ${cost.get('total_cost', 0):.4f}"
+        )
+
         return analysis
-        
+
     except requests.exceptions.HTTPError as e:
-        print(f"  ❌ Error HTTP: {e}")
-        if hasattr(e, 'response') and e.response is not None:
-            print(f"  Detalles: {e.response.text}")
+        print(f"❌ Error HTTP en Perplexity: {e}")
+        if e.response is not None:
+            print(f"Detalles: {e.response.text}")
         return None
+
     except Exception as e:
-        print(f"  ❌ Error: {e}")
+        print(f"❌ Error analizando vídeo con Perplexity: {e}")
         return None
 
 def format_to_html(text: str) -> str:
@@ -117,36 +115,20 @@ def format_to_html(text: str) -> str:
     return text
     
 def send_analysis(video: Dict) -> bool:
-    """
-    Procesar video completo y enviar a Telegram
-    Args:
-        video: Dict con id, title, link, published
-    Returns:
-        True si se envió correctamente
-    """
     try:
-        print(f"  📝 Obteniendo transcripción...")
-        transcript = get_transcript(video['id'])
-        if not transcript:
-            print(f"  ❌ No se pudo obtener transcripción")
-            return False
-        
-        print(f"  📄 Transcripción obtenida: {len(transcript)} caracteres")
-        
-        print(f"  🧠 Analizando con Perplexity Sonar Pro...")
-        analysis = analyze_with_perplexity(transcript, video['title'])
+        print("🧠 Analizando vídeo directamente con Perplexity...")
+        analysis = analyze_with_perplexity(video['link'], video['title'])
         if not analysis:
-            print(f"  ❌ No se pudo obtener análisis")
             return False
-        
-        # Antes de enviar, formatea el análisis
+
         safe_analysis = format_to_html(analysis)
         message = f"""🎬<b>{video['title']}</b>
-        
+
 {video['link']}
 
 {safe_analysis}
 """
+ 
         
         # Limitar a 4096 caracteres (límite de Telegram)
         if len(message) > 4096:

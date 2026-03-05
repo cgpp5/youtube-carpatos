@@ -1,16 +1,7 @@
-# Core dependencies
-perplexityai==0.20.0
-feedparser==6.0.11
-youtube-transcript-api>=1.0.0
-python-dotenv==1.0.0
-schedule==1.2.0
-
-# Utilities
-python-dateutil==2.8.2
-requests==2.31.0
-
-# Para Cloud Run
-flask==3.0.0
-gunicorn==21.2.0
-
-
+config
+dateutil
+dotenv
+feedparser
+requests
+youtube
+youtube_transcript_api

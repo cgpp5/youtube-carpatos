@@ -61,6 +61,9 @@ def get_transcript(video_id: str) -> Optional[str]:
         Transcripción completa como string, o None si falla
     """
     import os
+    import time
+    from youtube_transcript_api import YouTubeTranscriptApi
+    from youtube_transcript_api.proxies import GenericProxyConfig
     
     try:
         # Add delay to avoid YouTube rate limiting
@@ -70,22 +73,23 @@ def get_transcript(video_id: str) -> Optional[str]:
         evomi_user = os.getenv("EVOMI_USER")
         evomi_pass = os.getenv("EVOMI_PASS")
         
-        proxies = None
+        proxy_config = None
         if evomi_user and evomi_pass:
             proxy_url = f"http://{evomi_user}:{evomi_pass}@rp.evomi.com:1000"
-            proxies = {
-                "http": proxy_url,
-                "https": proxy_url
-            }
+            # Inyectamos las credenciales usando la clase nativa de la librería
+            proxy_config = GenericProxyConfig(
+                http_url=proxy_url,
+                https_url=proxy_url
+            )
             print(f"🔄 Usando Evomi proxy random para el video {video_id}")
             
-        ytt_api = YouTubeTranscriptApi()
-        
-        # Pasamos los proxies a tu método list si están configurados
-        if proxies:
-            transcript_list = ytt_api.list(video_id, proxies=proxies)
+        # Instanciamos la API pasándole la configuración del proxy (si existe)
+        if proxy_config:
+            ytt_api = YouTubeTranscriptApi(proxy_config=proxy_config)
         else:
-            transcript_list = ytt_api.list(video_id)
+            ytt_api = YouTubeTranscriptApi()
+            
+        transcript_list = ytt_api.list(video_id)
         
         # Intentar español primero
         try:
